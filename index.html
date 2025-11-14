@@ -119,7 +119,9 @@ function startQuiz() {
   document.getElementById('profileDisplay').classList.remove('hidden');
   document.getElementById('profileName').innerText = userName;
 
-  picked = [...questions].sort(() => Math.random() - 0.5); // shuffle
+ const shuffled = [...questions].sort(() => Math.random() - 0.5); // shuffle all questions
+picked = shuffled.slice(0, 10); // pick only 10 random questions
+// shuffle
   userAnswers = Array(picked.length).fill(null);
   currentIndex = 0;
   score = 0;
@@ -226,3 +228,4 @@ function escapeHtml(unsafe) {
 </script>
 </body>
 </html>
+
