@@ -55,187 +55,84 @@
   </div>
 
 <script>
-// Questions (30 sample; you can expand or fetch from API)
-const questions = [
+let questions = [
   { q: "What does HTML stand for?", options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "High Text Making Language", "None"], answer: 1 },
   { q: "CSS is used for?", options: ["Styling", "Backend", "Database", "Networking"], answer: 0 },
-  { q: "JS stands for?", options: ["JavaStarter", "JavaScript", "JustScript", "JumboSystem"], answer: 1 },
-  { q: "Which tag is for images?", options: ["<img>", "<image>", "<picture>", "<photo>"], answer: 0 },
-  { q: "Which company created JavaScript?", options: ["Google", "Microsoft", "Netscape", "Amazon"], answer: 2 },
-  { q: "React is a?", options: ["Backend", "Library", "Language", "Database"], answer: 1 },
-  { q: "Tailwind is a?", options: ["CSS Framework", "JS Library", "Backend", "Compiler"], answer: 0 },
-  { q: "2 + 2 =?", options: ["3","4","22","5"], answer: 1 },
-  { q: "Which is not a programming language?", options: ["Python","HTML","C++","Java"], answer: 1 },
-  { q: "DOM stands for?", options: ["Document Object Model","Data Object Mark","Design Object Map","Download Object Model"], answer: 0 },
-  { q: "Which is CSS framework?", options: ["Bootstrap","React","Node","MongoDB"], answer: 0 },
-  { q: "Which is database?", options: ["CSS","MongoDB","HTML","Bootstrap"], answer: 1 },
-  { q: "JS file extension?", options: [".script",".javascript",".js",".jv"], answer: 2 },
-  { q: "Which tag creates a link?", options: ["<a>","<link>","<goto>","<href>"], answer: 0 },
-  { q: "Full form of API?", options: ["App Processing Interface","Application Programming Interface","Applied Program Info","None"], answer: 1 },
-  { q: "Which stores data in browser?", options: ["CPU","RAM","LocalStorage","GPU"], answer: 2 },
-  { q: "Which is JS framework?", options: ["Laravel","React","Django","Flask"], answer: 1 },
-  { q: "Which is NoSQL DB?", options: ["MongoDB","MySQL","PostgreSQL","SQLServer"], answer: 0 },
-  { q: "Who invented the Web?", options: ["Bill Gates","Tim Berners-Lee","Elon Musk","Mark"], answer: 1 },
-  { q: "1+1=?", options: ["1","2","3","4"], answer: 1 },
-  { q: "Capital of India?", options: ["Mumbai","Delhi","Kolkata","Chennai"], answer: 1 },
-  { q: "Color of sky?", options: ["Blue","Red","Green","Pink"], answer: 0 },
-  { q: "SSD stands for?", options: ["Solid State Drive","Super Speed Disk","Soft Storage Device","None"], answer: 0 },
-  { q: "Keyboard key?", options: ["Shift","Screen","Fan","Cable"], answer: 0 },
-  { q: "Mouse is?", options: ["Output","Input","Both","None"], answer: 1 },
-  { q: "JS type?", options: ["Static","Dynamic","Manual","Hybrid"], answer: 1 },
-  { q: "Sun rises from?", options: ["East","West","North","South"], answer: 0 },
-  { q: "React uses?", options: ["JSX","PHP","Python","Ruby"], answer: 0 },
-  { q: "Google CEO?", options: ["Sundar Pichai","Bill Gates","Mukesh","Elon"], answer: 0 },
-  { q: "Which is fastest land animal?", options: ["Cheetah","Lion","Tiger","Leopard"], answer: 0 }
+  { q: "JS stands for?", options: ["JavaStarter", "JavaScript", "JustScript", "JumboSystem"], answer: 1 }
 ];
 
 let picked = [];
 let currentIndex = 0;
 let score = 0;
 let userName = "";
-let userAnswers = []; // store selected index per question or null
-
-const startBtn = document.getElementById('startBtn');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const checkBtn = document.getElementById('checkBtn');
-const restartBtn = document.getElementById('restartBtn');
-
-startBtn.addEventListener('click', startQuiz);
-prevBtn.addEventListener('click', prevQuestion);
-nextBtn.addEventListener('click', nextQuestion);
-checkBtn.addEventListener('click', checkCurrentAnswer);
-restartBtn.addEventListener('click', restartQuiz);
 
 function startQuiz() {
   userName = document.getElementById("nameInput").value.trim();
   if (!userName) return alert("Please enter your name!");
 
-  // prepare quiz
   document.getElementById("userInfo").classList.add("hidden");
   document.getElementById("quizSection").classList.remove("hidden");
-  document.getElementById('profileDisplay').classList.remove('hidden');
-  document.getElementById('profileName').innerText = userName;
 
-  const shuffled = [...questions].sort(() => Math.random() - 0.5);
-  const count = Math.min(10, shuffled.length);
-  picked = shuffled.slice(0, count);
-  userAnswers = Array(picked.length).fill(null);
-  currentIndex = 0;
-  score = 0;
+  shuffled = [...questions].sort(() => Math.random() - 0.5);
+  picked = shuffled.slice(0, questions.length); // FIXED
 
-  renderProgress();
   showQuestion();
-}
-
-function renderProgress() {
-  document.getElementById('progressText').innerText = `Question ${currentIndex + 1} / ${picked.length}`;
 }
 
 function showQuestion() {
   if (currentIndex >= picked.length) return finishQuiz();
 
-  renderProgress();
   const q = picked[currentIndex];
-
-  const optionsHtml = q.options.map((opt, i) => {
-    return `<button data-index="${i}" class="option w-full p-3 bg-gray-700 rounded-xl text-left font-medium hover:bg-gray-600 mb-2">${opt}</button>`;
-  }).join('');
-
-  document.getElementById('questionBox').innerHTML = `
-    <h2 class='text-xl font-semibold mb-4'>Q${currentIndex + 1}: ${escapeHtml(q.q)}</h2>
-    <div id='optionsWrap'>${optionsHtml}</div>
+  document.getElementById("quizSection").innerHTML = `
+    <h2 class='text-xl font-semibold'>Q${currentIndex + 1}: ${q.q}</h2>
+    <div class='space-y-3'>
+      ${q.options
+        .map((opt, i) => `
+        <button onclick="checkAnswer(${i})" class="option w-full p-3 bg-gray-700 rounded-xl text-left font-medium hover:bg-gray-600">${opt}</button>
+      `)
+        .join("")}
+    </div>
+    <div class='flex justify-between mt-4'>
+      <button onclick="prevQuestion()" class='px-4 py-2 bg-gray-600 rounded-xl'>⬅ Prev</button>
+      <button onclick="nextQuestion()" class='px-4 py-2 bg-blue-600 rounded-xl'>Next ➡</button>
+    </div>
   `;
-
-  // attach handlers
-  document.querySelectorAll('#optionsWrap .option').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = Number(btn.getAttribute('data-index'));
-      selectOption(idx);
-    });
-  });
-
-  // if previously answered, show selection
-  const prev = userAnswers[currentIndex];
-  if (prev !== null) {
-    markAnswer(prev);
-  }
-
-  // Prev/Next button states
-  prevBtn.disabled = currentIndex === 0;
 }
 
-function selectOption(idx) {
-  // store selection but do not auto-check correctness until user clicks Check
-  userAnswers[currentIndex] = idx;
-  // visually mark selection (temporary)
-  document.querySelectorAll('#optionsWrap .option').forEach(b => b.classList.remove('ring-2','ring-yellow-400'));
-  const el = document.querySelector(`#optionsWrap .option[data-index='${idx}']`);
-  if (el) el.classList.add('ring-2','ring-yellow-400');
-}
-
-function checkCurrentAnswer() {
+function checkAnswer(i) {
   const q = picked[currentIndex];
-  const selected = userAnswers[currentIndex];
-  const options = Array.from(document.querySelectorAll('#optionsWrap .option'));
-  if (selected === null) {
-    alert('Select an option first.');
-    return;
+  const options = document.querySelectorAll(".option");
+
+  if (i === q.answer) {
+    options[i].classList.add("correct");
+    score++;
+  } else {
+    options[i].classList.add("wrong");
+    options[q.answer].classList.add("correct");
   }
 
-  options.forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === q.answer) btn.classList.add('correct');
-    if (i === selected && i !== q.answer) btn.classList.add('wrong');
-  });
-
-  // update score but ensure counted once
-  // recompute score from userAnswers to avoid double counting
-  score = userAnswers.reduce((acc, ans, idx) => (ans === picked[idx].answer ? acc + 1 : acc), 0);
-
-  // after checking, enable Next (if not last)
+  options.forEach(btn => (btn.disabled = true));
 }
 
 function nextQuestion() {
-  if (currentIndex < picked.length - 1) {
-    currentIndex++;
-    showQuestion();
-  } else {
-    finishQuiz();
-  }
+  currentIndex++;
+  showQuestion();
 }
 
 function prevQuestion() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showQuestion();
-  }
+  if (currentIndex > 0) currentIndex--;
+  showQuestion();
 }
 
 function finishQuiz() {
-  document.getElementById('quizSection').classList.add('hidden');
-  document.getElementById('resultSection').classList.remove('hidden');
-  document.getElementById('finalScore').innerText = `${userName}, your quiz is completed!`;
-  document.getElementById('finalScoreBox').innerText = `Your Final Score: ${score} / ${picked.length}`;
+  document.getElementById("quizSection").classList.add("hidden");
+  document.getElementById("resultSection").classList.remove("hidden");
+
+  document.getElementById("finalScore").innerText = `Hey ${userName} 👋, You got ${score} out of ${picked.length}!`;
 }
 
 function restartQuiz() {
-  // reset UI
-  document.getElementById('resultSection').classList.add('hidden');
-  document.getElementById('userInfo').classList.remove('hidden');
-  document.getElementById('nameInput').value = '';
-  document.getElementById('profileDisplay').classList.add('hidden');
-  document.getElementById('profileName').innerText = '';
-  picked = []; currentIndex = 0; score = 0; userAnswers = [];
-}
-
-function escapeHtml(unsafe) {
-  return unsafe
-       .replace(/&/g, "&amp;")
-       .replace(/</g, "&lt;")
-       .replace(/>/g, "&gt;")
-       .replace(/\"/g, "&quot;")
-       .replace(/'/g, "&#039;");
+  location.reload();
 }
 </script>
 
